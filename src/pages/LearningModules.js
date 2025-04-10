@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Grid,
@@ -19,14 +19,17 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Paper,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
   PlayArrow as PlayIcon,
+  Timelapse as TimelapseIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import LearningContent from './LearningContent';
 
 const learningModules = [
   {
@@ -207,8 +210,43 @@ const learningModules = [
   },
 ];
 
+const WelcomeScreen = () => (
+  <Paper sx={{ p: 4, textAlign: 'center', height: '100%' }}>
+    <Typography variant="h4" gutterBottom>
+      Welcome to Learning Modules
+    </Typography>
+    <Typography variant="body1" paragraph>
+      Get started with your Databricks Data Engineer certification preparation by selecting a topic from the left sidebar.
+    </Typography>
+    <Box sx={{ my: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        Available Sections:
+      </Typography>
+      <List>
+        {learningModules.map((module, index) => (
+          <ListItem key={index}>
+            <ListItemIcon>
+              <PlayIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText 
+              primary={module.title}
+              secondary={`${module.topics.length} topics`}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+    <Typography variant="body2" color="text.secondary">
+      Click on any module to explore its topics and start learning
+    </Typography>
+  </Paper>
+);
+
 function LearningModules() {
+  const { topic } = useParams();
+  const location = useLocation();
   const [expanded, setExpanded] = useState(false);
+  const [selectedModule, setSelectedModule] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [modules, setModules] = useState(() => {
@@ -217,8 +255,24 @@ function LearningModules() {
   });
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (topic) {
+      // Find the module and topic that matches the URL parameter
+      for (let moduleIndex = 0; moduleIndex < learningModules.length; moduleIndex++) {
+        const module = learningModules[moduleIndex];
+        for (let topicIndex = 0; topicIndex < module.topics.length; topicIndex++) {
+          if (module.topics[topicIndex].name === decodeURIComponent(topic)) {
+            setSelectedModule(moduleIndex);
+            setSelectedTopic(topicIndex);
+            break;
+          }
+        }
+      }
+    }
+  }, [topic]);
+
   // Save to localStorage whenever modules change
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem('learning_modules', JSON.stringify(modules));
   }, [modules]);
 
@@ -237,16 +291,18 @@ function LearningModules() {
     }
   };
 
-  const handleStartLearning = (module, topic) => {
+  const handleStartLearning = (moduleIndex, topicIndex) => {
     // Update topic status to in-progress
     const newModules = [...modules];
-    const moduleIndex = newModules.findIndex(m => m.title === module.title);
-    const topicIndex = newModules[moduleIndex].topics.findIndex(t => t.name === topic.name);
+    const topic = newModules[moduleIndex].topics[topicIndex];
     newModules[moduleIndex].topics[topicIndex].status = 'in-progress';
     setModules(newModules);
 
-    setSelectedTopic({ module, topic });
-    setOpenDialog(true);
+    // Convert topic name to URL-friendly format
+    const moduleId = topic.name.toLowerCase().replace(/\s+/g, '-');
+    
+    // Navigate to the new module-based learning route
+    navigate(`/module/${moduleId}`);
   };
 
   const handleSubtopicClick = (moduleIndex, topicIndex, subtopicIndex) => {
@@ -277,9 +333,23 @@ function LearningModules() {
   };
 
   const handleNavigateToContent = () => {
-    if (selectedTopic) {
+    if (selectedTopic !== null && selectedModule !== null) {
       setOpenDialog(false);
-      navigate(`/learning/${encodeURIComponent(selectedTopic.topic.name)}`);
+      const topic = modules[selectedModule].topics[selectedTopic];
+      // Update the topic status to in-progress if it's not already completed
+      if (topic.status !== 'completed') {
+        const newModules = [...modules];
+        newModules[selectedModule].topics[selectedTopic].status = 'in-progress';
+        setModules(newModules);
+        localStorage.setItem('learning_modules', JSON.stringify(newModules));
+      }
+      // Navigate to the learning content with the new route
+      navigate(`/learning-content/${encodeURIComponent(topic.name)}`, {
+        state: { 
+          moduleTitle: modules[selectedModule].title,
+          topicName: topic.name
+        }
+      });
     }
   };
 
@@ -301,75 +371,71 @@ function LearningModules() {
       </Typography>
 
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="body1" gutterBottom>
           Overall Progress
         </Typography>
-        <LinearProgress
-          variant="determinate"
-          value={calculateOverallProgress()}
+        <LinearProgress 
+          variant="determinate" 
+          value={calculateOverallProgress()} 
           sx={{ height: 10, borderRadius: 5 }}
         />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {calculateOverallProgress()}% Complete
+          {Math.round(calculateOverallProgress())}% Complete
         </Typography>
       </Box>
 
       <Grid container spacing={3}>
-        {modules.map((module, moduleIndex) => (
-          <Grid item xs={12} key={module.title}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {module.title}
-                </Typography>
-                {module.topics.map((topic, topicIndex) => (
-                  <Accordion
-                    key={topic.name}
-                    expanded={expanded === `${moduleIndex}-${topicIndex}`}
-                    onChange={handleChange(`${moduleIndex}-${topicIndex}`)}
+        <Grid item xs={12} md={3}>
+          <Paper elevation={3}>
+            <List component="nav">
+              {learningModules.map((module, moduleIndex) => (
+                <React.Fragment key={module.title}>
+                  <ListItem
+                    button
+                    selected={selectedModule === moduleIndex}
+                    onClick={() => setSelectedModule(moduleIndex)}
                   >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                        <ListItemIcon>{getStatusIcon(topic.status)}</ListItemIcon>
-                        <Typography>{topic.name}</Typography>
-                      </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <List>
-                        {topic.subtopics.map((subtopic, subtopicIndex) => (
-                          <ListItem
-                            key={subtopic}
-                            button
-                            onClick={() => handleSubtopicClick(moduleIndex, topicIndex, subtopicIndex)}
-                          >
-                            <ListItemIcon>
-                              {topic.completedSubtopics && topic.completedSubtopics[subtopicIndex] ? (
-                                <CheckCircleIcon color="success" />
-                              ) : (
-                                <UncheckedIcon color="action" />
-                              )}
-                            </ListItemIcon>
-                            <ListItemText primary={subtopic} />
-                          </ListItem>
-                        ))}
-                      </List>
-                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<PlayIcon />}
-                          onClick={() => handleStartLearning(module, topic)}
+                    <ListItemText primary={module.title} />
+                  </ListItem>
+                  {selectedModule === moduleIndex && (
+                    <List component="div" disablePadding>
+                      {module.topics.map((topic, topicIndex) => (
+                        <ListItem
+                          button
+                          key={topic.name}
+                          selected={selectedTopic === topicIndex}
+                          onClick={() => handleStartLearning(moduleIndex, topicIndex)}
+                          sx={{ pl: 4 }}
                         >
-                          Start Learning
-                        </Button>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                          <ListItemIcon>
+                            {topic.status === 'completed' ? (
+                              <CheckCircleIcon color="success" />
+                            ) : topic.status === 'in-progress' ? (
+                              <TimelapseIcon color="primary" />
+                            ) : (
+                              <UncheckedIcon />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText primary={topic.name} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </React.Fragment>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={9}>
+          {selectedModule !== null && selectedTopic !== null ? (
+            <LearningContent
+              module={modules[selectedModule]}
+              topic={modules[selectedModule].topics[selectedTopic]}
+            />
+          ) : (
+            <WelcomeScreen />
+          )}
+        </Grid>
       </Grid>
 
       <Dialog
@@ -381,7 +447,11 @@ function LearningModules() {
         <DialogTitle>Start Learning</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you ready to start learning about {selectedTopic?.topic.name}?
+            Are you ready to start learning about{' '}
+            {selectedModule !== null && selectedTopic !== null
+              ? modules[selectedModule].topics[selectedTopic].name
+              : ''}
+            ?
           </Typography>
         </DialogContent>
         <DialogActions>

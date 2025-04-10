@@ -29,11 +29,23 @@ import {
 function Progress() {
   const getPerformanceData = () => {
     const modules = JSON.parse(localStorage.getItem('learning_modules') || '[]');
-    return modules.map(module => ({
-      topic: module.title.replace(/^\d+\.\s+/, ''), // Remove numbering from title
-      score: module.topics.filter(topic => topic.status === 'completed').length / module.topics.length * 100,
-      questions: module.topics.length
-    }));
+    const quizResults = JSON.parse(localStorage.getItem('module_quiz_results') || '{}');
+    
+    return modules.map(module => {
+      const moduleId = module.topics[0]?.name.toLowerCase().replace(/\s+/g, '-');
+      const moduleQuizzes = quizResults[moduleId]?.attempts || [];
+      const latestQuizScore = moduleQuizzes.length > 0 
+        ? moduleQuizzes[moduleQuizzes.length - 1].percentage 
+        : 0;
+
+      return {
+        topic: module.title.replace(/^\d+\.\s+/, ''),
+        score: latestQuizScore,
+        questions: moduleQuizzes.length > 0 ? moduleQuizzes[0].totalQuestions : 0,
+        progress: module.topics.filter(topic => topic.status === 'completed').length / module.topics.length * 100,
+        attempts: moduleQuizzes.length
+      };
+    });
   };
 
   const getStudyStreak = () => {
@@ -115,7 +127,6 @@ function Progress() {
           </Card>
         </Grid>
 
-        {/* Topic Performance Table */}
         <Grid item xs={12}>
           <Card>
             <CardContent>
@@ -127,9 +138,10 @@ function Progress() {
                   <TableHead>
                     <TableRow>
                       <TableCell>Topic</TableCell>
-                      <TableCell align="right">Score (%)</TableCell>
+                      <TableCell align="right">Quiz Score (%)</TableCell>
                       <TableCell align="right">Questions Attempted</TableCell>
                       <TableCell align="right">Progress</TableCell>
+                      <TableCell align="right">Quiz Attempts</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -145,15 +157,16 @@ function Progress() {
                             <Box sx={{ width: '100px', mr: 1 }}>
                               <LinearProgress
                                 variant="determinate"
-                                value={row.score}
+                                value={row.progress}
                                 sx={{ height: 8, borderRadius: 4 }}
                               />
                             </Box>
                             <Typography variant="body2">
-                              {Math.round(row.score)}%
+                              {Math.round(row.progress)}%
                             </Typography>
                           </Box>
                         </TableCell>
+                        <TableCell align="right">{row.attempts}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

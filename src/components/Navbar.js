@@ -39,49 +39,45 @@ import {
   RestartAlt as ResetIcon,
   DarkMode as DarkModeIcon,
   Notifications as NotificationsIcon,
+  Timeline as TimelineIcon,
+  Edit as EditIcon,
+  Assignment as AssignmentIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
+import { useUser } from '../context/UserContext';
 
 function Navbar() {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const location = useLocation();
+  const { userProfile } = useUser();
 
   // Settings state
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
   const [notifications, setNotifications] = useState(localStorage.getItem('notifications') !== 'false');
-
-  // Profile data (you would typically get this from your auth system)
-  const profileData = {
-    name: 'User',
-    email: 'user@example.com',
-    joinDate: new Date().toLocaleDateString(),
-    completedModules: 3,
-    quizzesTaken: 5,
-    averageScore: '78%'
-  };
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
   const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+    setProfileMenuAnchor(event.currentTarget);
   };
 
   const handleProfileMenuClose = () => {
-    setAnchorEl(null);
+    setProfileMenuAnchor(null);
   };
 
   const handleProfileClick = () => {
     handleProfileMenuClose();
-    setProfileDialogOpen(true);
+    navigate('/profile');
   };
 
   const handleSettingsClick = () => {
@@ -141,17 +137,28 @@ function Navbar() {
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-    { name: 'Learning', path: '/learning', icon: <SchoolIcon /> },
+    { name: 'Learning', path: '/learning-modules', icon: <SchoolIcon /> },
     { name: 'Quiz', path: '/quiz', icon: <QuizIcon /> },
-    { name: 'Progress', path: '/progress', icon: <AssessmentIcon /> },
+    { name: 'Progress', path: '/progress', icon: <TimelineIcon /> },
     { name: 'Study Plan', path: '/study-plan', icon: <CalendarIcon /> },
+    { name: 'Mock Test', path: '/mock-test', icon: <AssignmentIcon /> },
   ];
 
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
+        <Box
+          component="img"
+          src="/databricks-logo.png"
+          alt="Databricks Logo"
+          sx={{
+            height: '32px',
+            mr: 2,
+            display: 'block',
+          }}
+        />
         <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-          DBX Quiz App
+           Certification Prep
         </Typography>
       </Box>
       <Divider />
@@ -163,7 +170,7 @@ function Navbar() {
             component={RouterLink}
             to={item.path}
             selected={isActive(item.path)}
-            onClick={handleDrawerToggle}
+            onClick={() => setDrawerOpen(false)}
             sx={{
               borderRadius: '0 24px 24px 0',
               mr: 2,
@@ -287,13 +294,13 @@ function Navbar() {
                   bgcolor: theme.palette.primary.main,
                 }}
               >
-                <PersonIcon />
+                {userProfile.name[0].toUpperCase()}
               </Avatar>
             </IconButton>
             <Menu
               id="profile-menu"
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
+              anchorEl={profileMenuAnchor}
+              open={Boolean(profileMenuAnchor)}
               onClose={handleProfileMenuClose}
               PaperProps={{
                 sx: {
@@ -306,31 +313,36 @@ function Navbar() {
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              <MenuItem onClick={handleProfileClick}>
-                <ListItemIcon>
-                  <PersonIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Profile</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={handleSettingsClick}>
-                <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Settings</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={handleResetClick}>
-                <ListItemIcon>
-                  <ResetIcon fontSize="small" color="error" />
-                </ListItemIcon>
-                <ListItemText sx={{ color: 'error.main' }}>Reset Progress</ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleLogoutClick}>
-                <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Logout</ListItemText>
-              </MenuItem>
+              <Box sx={{ p: 2, minWidth: 200 }}>
+                <Box sx={{ mb: 2, textAlign: 'center' }}>
+                  <Avatar sx={{ width: 60, height: 60, mb: 1, mx: 'auto', bgcolor: 'primary.main' }}>
+                    {userProfile.name[0].toUpperCase()}
+                  </Avatar>
+                  <Typography variant="subtitle1">{userProfile.name}</Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    {userProfile.email}
+                  </Typography>
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <MenuItem onClick={handleProfileClick}>
+                  <ListItemIcon>
+                    <PersonIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Edit Profile" />
+                </MenuItem>
+                <MenuItem onClick={handleSettingsClick}>
+                  <ListItemIcon>
+                    <SettingsIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Settings" />
+                </MenuItem>
+                <MenuItem onClick={handleLogoutClick}>
+                  <ListItemIcon>
+                    <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Sign Out" />
+                </MenuItem>
+              </Box>
             </Menu>
           </Box>
         </Toolbar>
@@ -385,25 +397,25 @@ function Navbar() {
                 <PersonIcon sx={{ fontSize: 40 }} />
               </Avatar>
               <Box>
-                <Typography variant="h6">{profileData.name}</Typography>
+                <Typography variant="h6">{userProfile.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {profileData.email}
+                  {userProfile.email}
                 </Typography>
               </Box>
             </Box>
             <Divider />
             <Box sx={{ display: 'grid', gap: 2 }}>
               <Typography variant="body2">
-                <strong>Member since:</strong> {profileData.joinDate}
+                <strong>Member since:</strong> {userProfile.memberSince}
               </Typography>
               <Typography variant="body2">
-                <strong>Completed Modules:</strong> {profileData.completedModules}
+                <strong>Completed Modules:</strong> {userProfile.completedModules}
               </Typography>
               <Typography variant="body2">
-                <strong>Quizzes Taken:</strong> {profileData.quizzesTaken}
+                <strong>Quizzes Taken:</strong> {userProfile.quizzesTaken}
               </Typography>
               <Typography variant="body2">
-                <strong>Average Score:</strong> {profileData.averageScore}
+                <strong>Average Score:</strong> {userProfile.averageScore}%
               </Typography>
             </Box>
           </Box>

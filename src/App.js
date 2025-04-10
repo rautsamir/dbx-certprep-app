@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
+import { UserProvider } from './context/UserContext';
 
 // Components
 import Navbar from './components/Navbar';
@@ -12,6 +13,11 @@ import LearningContent from './pages/LearningContent';
 import Quiz from './pages/Quiz';
 import Progress from './pages/Progress';
 import StudyPlan from './pages/StudyPlan';
+import UserProfile from './pages/UserProfile';
+import MockTest from './pages/MockTest';
+import Profile from './pages/Profile';
+import LearningModule from './pages/LearningModule';
+import ModuleQuiz from './pages/ModuleQuiz';
 
 // Create theme
 const theme = createTheme({
@@ -163,32 +169,39 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Box sx={{ display: 'flex' }}>
-          <Navbar />
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: 3,
-              mt: '64px', // Height of the navbar
-              ml: { xs: 0, md: '250px' }, // Width of the drawer on desktop
-              width: { xs: '100%', md: `calc(100% - 250px)` },
-              minHeight: '100vh',
-              bgcolor: 'background.default',
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/learning" element={<LearningModules />} />
-              <Route path="/learning/:topic" element={<LearningContent />} />
-              <Route path="/quiz" element={<Quiz />} />
-              <Route path="/progress" element={<Progress />} />
-              <Route path="/study-plan" element={<StudyPlan />} />
-            </Routes>
+      <UserProvider>
+        <Router>
+          <Box sx={{ display: 'flex' }}>
+            <Navbar />
+            <Box
+              component="main"
+              sx={{
+                flexGrow: 1,
+                p: 3,
+                mt: '64px', // Height of the navbar
+                ml: { xs: 0, md: '250px' }, // Width of the drawer on desktop
+                width: { xs: '100%', md: `calc(100% - 250px)` },
+                minHeight: '100vh',
+                bgcolor: 'background.default',
+              }}
+            >
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/learning-modules" element={<LearningModules />} />
+                <Route path="/learning-content/:topic" element={<LearningContent />} />
+                <Route path="/quiz" element={<Quiz />} />
+                <Route path="/progress" element={<Progress />} />
+                <Route path="/study-plan" element={<StudyPlan />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/mock-test" element={<MockTest />} />
+                <Route path="/mock-exam/:examType" element={<MockTest />} />
+                <Route path="/module/:moduleId" element={<LearningModule />} />
+                <Route path="/module/:moduleId/quiz" element={<ModuleQuiz />} />
+              </Routes>
+            </Box>
           </Box>
-        </Box>
-      </Router>
+        </Router>
+      </UserProvider>
     </ThemeProvider>
   );
 }
