@@ -43,6 +43,7 @@ import {
   Edit as EditIcon,
   Assignment as AssignmentIcon,
   History as HistoryIcon,
+  MenuBook as MenuBookIcon,
 } from '@mui/icons-material';
 import { useUser } from '../context/UserContext';
 
@@ -142,6 +143,7 @@ function Navbar() {
     { name: 'Progress', path: '/progress', icon: <TimelineIcon /> },
     { name: 'Study Plan', path: '/study-plan', icon: <CalendarIcon /> },
     { name: 'Mock Test', path: '/mock-test', icon: <AssignmentIcon /> },
+    { name: 'Flashcards', path: '/flashcards', icon: <MenuBookIcon /> },
   ];
 
   const drawer = (

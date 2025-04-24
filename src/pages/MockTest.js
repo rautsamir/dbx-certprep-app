@@ -518,7 +518,7 @@ const officialMockExam = {
       options: [
         "They need to create a Delta Live Tables pipeline from the Data page.",
         "They need to create a Delta Live Tables pipeline from the Jobs page.",
-        "They need to create a Delta Live tables pipeline from the Compute page.",
+        "They need to create a Delta tables pipeline from the Compute page.",
         "They need to refactor their notebook to use Python and the dlt library.",
         "They need to refactor their notebook to use SQL and CREATE LIVE TABLE keyword."
       ],
@@ -762,6 +762,286 @@ const mockExam = {
       ],
       correctAnswer: 2,
       explanation: "Delta Lake's MERGE operation enables atomic upserts, allowing you to simultaneously update existing records and insert new ones in a single transaction."
+    },
+    {
+      id: 6,
+      category: "Databricks Lakehouse Platform",
+      question: "A data architect is designing a data model that works for both video-based machine learning workloads and highly audited batch ETL/ELT workloads. Which of the following describes how using a data lakehouse can help the data architect meet the needs of both workloads?",
+      options: [
+        "A data lakehouse requires very little data modeling.",
+        "A data lakehouse combines compute and storage for simple governance.",
+        "A data lakehouse provides autoscaling for compute clusters.",
+        "A data lakehouse stores unstructured data and is ACID-compliant.",
+        "A data lakehouse fully exists in the cloud."
+      ],
+      correctAnswer: 3,
+      explanation: "A data lakehouse stores unstructured data and is ACID-compliant, making it suitable for both ML workloads and ETL/ELT workloads."
+    },
+    {
+      id: 7,
+      category: "Databricks Lakehouse Platform",
+      question: "Which of the following describes a scenario in which a data engineer will want to use a Job cluster instead of an all-purpose cluster?",
+      options: [
+        "An ad-hoc analytics report needs to be developed while minimizing compute costs.",
+        "A data team needs to collaborate on the development of a machine learning model.",
+        "An automated workflow needs to be run every 30 minutes.",
+        "A Databricks SQL query needs to be scheduled for upward reporting.",
+        "A data engineer needs to manually investigate a production error."
+      ],
+      correctAnswer: 2,
+      explanation: "Job clusters are ideal for automated workflows that run on a schedule, such as every 30 minutes."
+    },
+    {
+      id: 8,
+      category: "Delta Lake",
+      question: "Which of the following statements describes Delta Lake?",
+      options: [
+        "Delta Lake is an open source analytics engine used for big data workloads.",
+        "Delta Lake is an open format storage layer that delivers reliability, security, and performance.",
+        "Delta Lake is an open source platform to help manage the complete machine learning lifecycle.",
+        "Delta Lake is an open source data storage format for distributed data.",
+        "Delta Lake is an open format storage layer that processes data."
+      ],
+      correctAnswer: 1,
+      explanation: "Delta Lake is an open format storage layer that delivers reliability, security, and performance for data lakes."
+    },
+    {
+      id: 9,
+      category: "Delta Lake",
+      question: "A data architect has determined that a table of the following format is necessary: id, a1, birthDate, 1990-01-06, avgRating, 5.5, a2, …, 1974-11-21, …, 7.1, … Which of the following code blocks uses SQL DDL commands to create an empty Delta table in the above format regardless of whether a table already exists with this name?",
+      options: [
+        "CREATE OR REPLACE TABLE table_name AS SELECT id STRING, birthDate DATE, avgRating FLOAT USING DELTA",
+        "CREATE OR REPLACE TABLE table_name (id STRING, birthDate DATE, avgRating FLOAT)",
+        "CREATE TABLE IF NOT EXISTS table_name (id STRING, birthDate DATE, avgRating FLOAT)",
+        "CREATE TABLE table_name AS SELECT id STRING, birthDate DATE, avgRating FLOAT",
+        "CREATE OR REPLACE TABLE table_name WITH COLUMNS (id STRING, birthDate DATE, avgRating FLOAT) USING DELTA"
+      ],
+      correctAnswer: 1,
+      explanation: "CREATE OR REPLACE TABLE with column definitions is the correct way to create an empty Delta table regardless of whether it exists."
+    },
+    {
+      id: 10,
+      category: "Delta Lake",
+      question: "Which of the following SQL keywords can be used to append new rows to an existing Delta table?",
+      options: [
+        "UPDATE",
+        "COPY",
+        "INSERT INTO",
+        "DELETE",
+        "UNION"
+      ],
+      correctAnswer: 2,
+      explanation: "INSERT INTO is the SQL keyword used to append new rows to an existing Delta table."
+    },
+    {
+      id: 11,
+      category: "Delta Lake",
+      question: "A data engineering team has created a series of tables using Parquet data stored in an external system. The team is noticing that after appending new rows to the data in the external system, their queries within Databricks are not returning the new rows. They identify the caching of the previous data as the cause of this issue. Which of the following approaches will ensure that the data returned by queries is always up-to-date?",
+      options: [
+        "The tables should be converted to the Delta format",
+        "The tables should be stored in a cloud-based external system",
+        "The tables should be refreshed in the writing cluster before the next query is run",
+        "The tables should be altered to include metadata to not cache",
+        "The tables should be updated before the next query is run"
+      ],
+      correctAnswer: 0,
+      explanation: "Converting the tables to Delta format will ensure that queries always return up-to-date data."
+    },
+    {
+      id: 12,
+      category: "Delta Lake",
+      question: "A table customerLocations exists with the following schema: id STRING, date STRING, city STRING, country STRING. A senior data engineer wants to create a new table from this table using the following command: CREATE TABLE customersPerCountry AS SELECT country, COUNT(*) AS customers FROM customerLocations GROUP BY country; A junior data engineer asks why the schema is not being declared for the new table. Which of the following responses explains why declaring the schema is not necessary?",
+      options: [
+        "CREATE TABLE AS SELECT statements adopt schema details from the source table and query.",
+        "CREATE TABLE AS SELECT statements infer the schema by scanning the data.",
+        "CREATE TABLE AS SELECT statements result in tables where schemas are optional.",
+        "CREATE TABLE AS SELECT statements assign all columns the type STRING.",
+        "CREATE TABLE AS SELECT statements result in tables that do not support schemas."
+      ],
+      correctAnswer: 0,
+      explanation: "CREATE TABLE AS SELECT statements automatically adopt the schema details from the source table and query."
+    },
+    {
+      id: 13,
+      category: "Delta Lake",
+      question: "A data engineer has ingested a JSON file into a table raw_table with the following schema: transaction_id STRING, payload ARRAY<customer_id:STRING, date:TIMESTAMP, store_id:STRING> The data engineer wants to efficiently extract the date of each transaction into a table with the following schema: transaction_id STRING, date TIMESTAMP Which of the following commands should the data engineer run to complete this task?",
+      options: [
+        "SELECT transaction_id, explode(payload) FROM raw_table;",
+        "SELECT transaction_id, payload.date FROM raw_table;",
+        "SELECT transaction_id, date FROM raw_table;",
+        "SELECT transaction_id, payload[date] FROM raw_table;",
+        "SELECT transaction_id, date from payload FROM raw_table;"
+      ],
+      correctAnswer: 1,
+      explanation: "Using dot notation (payload.date) is the correct way to access nested fields in a struct within an array."
+    },
+    {
+      id: 14,
+      category: "Delta Lake",
+      question: "A data engineer has developed a code block to perform a streaming read on a data source. The code block is below: (spark.read.schema(schema).format('cloudFiles').option('cloudFiles.format', 'json').load(dataSource)) The code block is returning an error. Which of the following changes should be made to the code block to configure the block to successfully perform a streaming read?",
+      options: [
+        "The .read line should be replaced with .readStream.",
+        "A new .stream line should be added after the .read line.",
+        "The .format('cloudFiles') line should be replaced with .format('stream').",
+        "A new .stream line should be added after the spark line.",
+        "A new .stream line should be added after the .load(dataSource) line."
+      ],
+      correctAnswer: 0,
+      explanation: "For streaming reads, .read should be replaced with .readStream."
+    },
+    {
+      id: 15,
+      category: "Delta Lake",
+      question: "A data engineer has configured a Structured Streaming job to read from a table, manipulate the data, and then perform a streaming write into a new table. The code block used by the data engineer is below: (spark.table('sales').withColumn('avg_price', col('sales') / col('units')).writeStream.option('checkpointLocation', checkpointPath).outputMode('complete')._____.table('new_sales')) If the data engineer only wants the query to execute a single micro-batch to process all of the available data, which of the following lines of code should the data engineer use to fill in the blank?",
+      options: [
+        "trigger(once=True)",
+        "trigger(continuous='once')",
+        "processingTime('once')",
+        "trigger(processingTime='once')",
+        "processingTime(1)"
+      ],
+      correctAnswer: 0,
+      explanation: "trigger(once=True) is the correct option to execute a single micro-batch and then stop."
+    },
+    {
+      id: 16,
+      category: "Delta Lake",
+      question: "Which of the following data workloads will utilize a Bronze table as its source?",
+      options: [
+        "A job that aggregates cleaned data to create standard summary statistics",
+        "A job that queries aggregated data to publish key insights into a dashboard",
+        "A job that ingests raw data from a streaming source into the Lakehouse",
+        "A job that develops a feature set for a machine learning application",
+        "A job that enriches data by parsing its timestamps into a human-readable format"
+      ],
+      correctAnswer: 4,
+      explanation: "A job that enriches data by parsing timestamps would use a Bronze table as its source, as Bronze tables contain raw, unprocessed data."
+    },
+    {
+      id: 17,
+      category: "Delta Lake",
+      question: "Which of the following data workloads will utilize a Silver table as its source?",
+      options: [
+        "A job that enriches data by parsing its timestamps into a human-readable format",
+        "A job that queries aggregated data that already feeds into a dashboard",
+        "A job that ingests raw data from a streaming source into the Lakehouse",
+        "A job that aggregates cleaned data to create standard summary statistics",
+        "A job that cleans data by removing malformatted records"
+      ],
+      correctAnswer: 3,
+      explanation: "A job that aggregates cleaned data would use a Silver table as its source, as Silver tables contain cleaned and validated data."
+    },
+    {
+      id: 18,
+      category: "Delta Lake",
+      question: "A data engineer has written the following query: SELECT * FROM json.`/path/to/json/file.json`; The data engineer asks a colleague for help to convert this query for use in a Delta Live Tables (DLT) pipeline. The query should create the first table in the DLT pipeline. Which of the following describes the change the colleague needs to make to the query?",
+      options: [
+        "They need to add a COMMENT line at the beginning of the query.",
+        "They need to add a CREATE LIVE TABLE table_name AS line at the beginning of the query.",
+        "They need to add a live. prefix prior to json. in the FROM line.",
+        "They need to add a CREATE DELTA LIVE TABLE table_name AS line at the beginning of the query.",
+        "They need to add the cloud_files(...) wrapper to the JSON file path."
+      ],
+      correctAnswer: 1,
+      explanation: "Adding CREATE LIVE TABLE table_name AS at the beginning of the query is required for DLT pipelines."
+    },
+    {
+      id: 19,
+      category: "Delta Lake",
+      question: "A dataset has been defined using Delta Live Tables and includes an expectations clause: CONSTRAINT valid_timestamp EXPECT (timestamp > '2020-01-01') What is the expected behavior when a batch of data containing data that violates these constraints is processed?",
+      options: [
+        "Records that violate the expectation are added to the target dataset and recorded as invalid in the event log.",
+        "Records that violate the expectation are dropped from the target dataset and recorded as invalid in the event log.",
+        "Records that violate the expectation cause the job to fail.",
+        "Records that violate the expectation are added to the target dataset and flagged as invalid in a field added to the target dataset.",
+        "Records that violate the expectation are dropped from the target dataset and loaded into a quarantine table."
+      ],
+      correctAnswer: 0,
+      explanation: "In Delta Live Tables, records that violate expectations are added to the target dataset and recorded as invalid in the event log."
+    },
+    {
+      id: 20,
+      category: "Delta Lake",
+      question: "A Delta Live Table pipeline includes two datasets defined using STREAMING LIVE TABLE. Three datasets are defined against Delta Lake table sources using LIVE TABLE. The table is configured to run in Development mode using the Triggered Pipeline Mode. Assuming previously unprocessed data exists and all definitions are valid, what is the expected outcome after clicking Start to update the pipeline?",
+      options: [
+        "All datasets will be updated once and the pipeline will shut down. The compute resources will be terminated.",
+        "All datasets will be updated at set intervals until the pipeline is shut down. The compute resources will be deployed for the update and terminated when the pipeline is stopped.",
+        "All datasets will be updated at set intervals until the pipeline is shut down. The compute resources will persist after the pipeline is stopped to allow for additional testing.",
+        "All datasets will be updated once and the pipeline will shut down. The compute resources will persist to allow for additional testing.",
+        "All datasets will be updated continuously and the pipeline will not shut down. The compute resources will persist with the pipeline."
+      ],
+      correctAnswer: 3,
+      explanation: "In Development mode with Triggered Pipeline Mode, datasets are updated once and compute resources persist for testing."
+    },
+    {
+      id: 21,
+      category: "Delta Lake",
+      question: "A data engineer has a Job with multiple tasks that runs nightly. One of the tasks unexpectedly fails during 10 percent of the runs. Which of the following actions can the data engineer perform to ensure the Job completes each night while minimizing compute costs?",
+      options: [
+        "They can institute a retry policy for the entire Job",
+        "They can observe the task as it runs to try and determine why it is failing",
+        "They can set up the Job to run multiple times ensuring that at least one will complete",
+        "They can institute a retry policy for the task that periodically fails",
+        "They can utilize a Jobs cluster for each of the tasks in the Job"
+      ],
+      correctAnswer: 3,
+      explanation: "Setting up a retry policy for the specific failing task is the most cost-effective solution."
+    },
+    {
+      id: 22,
+      category: "Delta Lake",
+      question: "A data engineer has set up two Jobs that each run nightly. The first Job starts at 12:00 AM, and it usually completes in about 20 minutes. The second Job depends on the first Job, and it starts at 12:30 AM. Sometimes, the second Job fails when the first Job does not complete by 12:30 AM. Which of the following approaches can the data engineer use to avoid this problem?",
+      options: [
+        "They can utilize multiple tasks in a single job with a linear dependency",
+        "They can use cluster pools to help the Jobs run more efficiently",
+        "They can set up a retry policy on the first Job to help it run more quickly",
+        "They can limit the size of the output in the second Job so that it will not fail as easily",
+        "They can set up the data to stream from the first Job to the second Job"
+      ],
+      correctAnswer: 0,
+      explanation: "Using multiple tasks in a single job with linear dependencies ensures proper sequencing."
+    },
+    {
+      id: 23,
+      category: "Delta Lake",
+      question: "A data engineer has set up a notebook to automatically process using a Job. The data engineer's manager wants to version control the schedule due to its complexity. Which of the following approaches can the data engineer use to obtain a version-controllable configuration of the Job's schedule?",
+      options: [
+        "They can link the Job to notebooks that are a part of a Databricks Repo.",
+        "They can submit the Job once on a Job cluster.",
+        "They can download the JSON description of the Job from the Job's page.",
+        "They can submit the Job once on an all-purpose cluster.",
+        "They can download the XML description of the Job from the Job's page."
+      ],
+      correctAnswer: 2,
+      explanation: "Downloading the JSON description of the Job provides a version-controllable configuration."
+    },
+    {
+      id: 24,
+      category: "Delta Lake",
+      question: "A data engineering team has been using a Databricks SQL query to monitor the performance of an ELT job. The ELT job is triggered by a specific number of input records being ready to process. The Databricks SQL query returns the number of minutes since the job's most recent runtime. Which of the following approaches can enable the data engineering team to be notified if the ELT job has not been run in an hour?",
+      options: [
+        "They can set up an Alert for the accompanying dashboard to notify them if the returned value is greater than 60.",
+        "They can set up an Alert for the query to notify when the ELT job fails.",
+        "They can set up an Alert for the accompanying dashboard to notify when it has not refreshed in 60 minutes.",
+        "They can set up an Alert for the query to notify them if the returned value is greater than 60.",
+        "This type of alerting is not possible in Databricks."
+      ],
+      correctAnswer: 3,
+      explanation: "Setting up an Alert on the query to notify when the returned value is greater than 60 minutes is the correct approach."
+    },
+    {
+      id: 25,
+      category: "Delta Lake",
+      question: "A data engineering manager has noticed that each of the queries in a Databricks SQL dashboard takes a few minutes to update when they manually click the 'Refresh' button. They are curious why this might be occurring, so a team member provides a variety of reasons on why the delay might be occurring. Which of the following reasons fails to explain why the dashboard might be taking a few minutes to update?",
+      options: [
+        "The SQL endpoint being used by each of the queries might need a few minutes to start up.",
+        "The queries attached to the dashboard might take a few minutes to run under normal circumstances.",
+        "The queries attached to the dashboard might first be checking to determine if new data is available.",
+        "The Job associated with updating the dashboard might be using a non-pooled endpoint.",
+        "The queries attached to the dashboard might all be connected to their own, unstarted Databricks clusters."
+      ],
+      correctAnswer: 3,
+      explanation: "Using a non-pooled endpoint is not a reason for dashboard update delays."
     }
   ]
 };

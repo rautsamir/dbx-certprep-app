@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import Box from '@mui/material/Box';
 import { UserProvider } from './context/UserContext';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 // Components
 import Navbar from './components/Navbar';
@@ -18,6 +18,8 @@ import MockTest from './pages/MockTest';
 import Profile from './pages/Profile';
 import LearningModule from './pages/LearningModule';
 import ModuleQuiz from './pages/ModuleQuiz';
+import PracticeExercise from './pages/PracticeExercise';
+import Flashcards from './pages/Flashcards';
 
 // Create theme
 const theme = createTheme({
@@ -197,6 +199,8 @@ function App() {
                 <Route path="/mock-exam/:examType" element={<MockTest />} />
                 <Route path="/module/:moduleId" element={<LearningModule />} />
                 <Route path="/module/:moduleId/quiz" element={<ModuleQuiz />} />
+                <Route path="/practice/:moduleId/:exerciseId" element={<PracticeExercise />} />
+                <Route path="/flashcards" element={<Flashcards />} />
               </Routes>
             </Box>
           </Box>
