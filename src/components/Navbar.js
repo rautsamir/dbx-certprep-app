@@ -47,7 +47,7 @@ import {
 } from '@mui/icons-material';
 import { useUser } from '../context/UserContext';
 
-function Navbar() {
+function Navbar({ onToggleTheme }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -101,9 +101,9 @@ function Navbar() {
   };
 
   const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode);
-    localStorage.setItem('darkMode', (!darkMode).toString());
-    // You would typically handle theme change here
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    onToggleTheme();
   };
 
   const handleNotificationsToggle = () => {

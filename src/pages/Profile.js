@@ -4,10 +4,9 @@ import {
   Paper,
   Typography,
   Box,
-  Grid,
-  Card,
-  CardContent,
   Button,
+  TextField,
+  Avatar,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -16,12 +15,7 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider,
   Alert,
-  LinearProgress,
-  TextField,
-  Avatar,
-  IconButton,
 } from '@mui/material';
 import {
   School as SchoolIcon,
@@ -30,34 +24,46 @@ import {
   History as HistoryIcon,
   Delete as DeleteIcon,
   Warning as WarningIcon,
-  Edit as EditIcon,
-  PhotoCamera as PhotoCameraIcon,
 } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const Profile = () => {
+  const { userProfile, updateUserProfile } = useUser();
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const location = useLocation();
-
-  // Mock data - in real app, this would come from your state management
-  const [userProfile, setUserProfile] = useState({
-    name: 'Samir',
-    email: 'samir88@gmail.com',
-    completedModules: 0,
-    totalModules: 50,
-    quizzesTaken: 0,
-    averageScore: 0,
-    memberSince: '2024-04-09',
-    streak: 0,
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: ''
   });
 
-  React.useEffect(() => {
-    // Check if we should open edit mode from navigation state
-    if (location.state?.openEdit) {
-      setIsEditing(true);
-    }
-  }, [location]);
+  const handleOpenEditDialog = () => {
+    setEditForm({
+      name: userProfile.name || '',
+      email: userProfile.email || ''
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveProfile = () => {
+    updateUserProfile({
+      ...userProfile,
+      name: editForm.name,
+      email: editForm.email
+    });
+    setEditDialogOpen(false);
+  };
 
   const handleResetLearning = () => {
     localStorage.clear();
@@ -65,176 +71,144 @@ const Profile = () => {
     window.location.reload();
   };
 
-  const handleSaveProfile = () => {
-    setIsEditing(false);
-    // Here you would typically save the profile changes to your backend/state management
-  };
-
-  const ProfileView = () => (
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Box sx={{ mb: 3 }}>
-            <Avatar
-              sx={{
-                width: 100,
-                height: 100,
-                mx: 'auto',
-                mb: 2,
-                bgcolor: 'primary.main',
-                fontSize: '2.5rem',
-              }}
-            >
-              {userProfile.name[0].toUpperCase()}
-            </Avatar>
-            <Typography variant="h5" gutterBottom>
-              {userProfile.name}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {userProfile.email}
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={() => setIsEditing(true)}
-          >
-            Edit Profile
-          </Button>
-        </Paper>
-      </Grid>
-    </Grid>
-  );
-
-  const ProfileEdit = () => (
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Paper sx={{ p: 3 }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Avatar
-              sx={{
-                width: 100,
-                height: 100,
-                mx: 'auto',
-                mb: 1,
-                bgcolor: 'primary.main',
-                fontSize: '2.5rem',
-              }}
-            >
-              {userProfile.name[0].toUpperCase()}
-            </Avatar>
-            <IconButton
-              color="primary"
-              aria-label="upload picture"
-              component="label"
-              sx={{ mt: -5, ml: 7 }}
-            >
-              <input hidden accept="image/*" type="file" />
-              <PhotoCameraIcon />
-            </IconButton>
-          </Box>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Name"
-                value={userProfile.name}
-                onChange={(e) => setUserProfile({ ...userProfile, name: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Email"
-                value={userProfile.email}
-                onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
-              />
-            </Grid>
-          </Grid>
-
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Learning Statistics
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemIcon>
-                  <HistoryIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Member Since"
-                  secondary={new Date(userProfile.memberSince).toLocaleDateString()}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <SchoolIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Completed Modules"
-                  secondary={`${userProfile.completedModules} / ${userProfile.totalModules}`}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <TrophyIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Quizzes Taken"
-                  secondary={userProfile.quizzesTaken}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <TimelineIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Average Score"
-                  secondary={`${userProfile.averageScore}%`}
-                />
-              </ListItem>
-            </List>
-          </Box>
-
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Danger Zone
-            </Typography>
-            <Button
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={() => setResetDialogOpen(true)}
-              variant="outlined"
-              fullWidth
-            >
-              Reset Learning History
-            </Button>
-          </Box>
-
-          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button onClick={() => setIsEditing(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleSaveProfile}
-            >
-              Save Changes
-            </Button>
-          </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+  const StatItem = ({ icon: Icon, label, value }) => (
+    <ListItem>
+      <ListItemIcon>
+        <Icon color="primary" />
+      </ListItemIcon>
+      <ListItemText 
+        primary={label}
+        secondary={value}
+        primaryTypography={{ variant: 'subtitle1' }}
+        secondaryTypography={{ variant: 'h6' }}
+      />
+    </ListItem>
   );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Profile
-      </Typography>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      {/* Profile Overview */}
+      <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Avatar
+            sx={{
+              width: 120,
+              height: 120,
+              mx: 'auto',
+              mb: 2,
+              bgcolor: 'primary.main',
+              fontSize: '3rem',
+            }}
+          >
+            {userProfile.name ? userProfile.name[0].toUpperCase() : 'G'}
+          </Avatar>
+          <Typography variant="h4" gutterBottom>
+            {userProfile.name || 'Guest'}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            {userProfile.email || 'No email set'}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleOpenEditDialog}
+            sx={{ mt: 2 }}
+          >
+            Edit Profile
+          </Button>
+        </Box>
 
-      {isEditing ? <ProfileEdit /> : <ProfileView />}
+        {/* Stats Section */}
+        <Paper variant="outlined" sx={{ p: 2, mt: 4 }}>
+          <Typography variant="h6" gutterBottom sx={{ px: 2, pt: 1 }}>
+            Learning Progress
+          </Typography>
+          <List>
+            <StatItem
+              icon={HistoryIcon}
+              label="Member Since"
+              value={new Date(userProfile.memberSince).toLocaleDateString()}
+            />
+            <StatItem
+              icon={SchoolIcon}
+              label="Completed Modules"
+              value={userProfile.completedModules || 0}
+            />
+            <StatItem
+              icon={TrophyIcon}
+              label="Quizzes Taken"
+              value={userProfile.quizzesTaken || 0}
+            />
+            <StatItem
+              icon={TimelineIcon}
+              label="Average Score"
+              value={`${userProfile.averageScore || 0}%`}
+            />
+          </List>
+        </Paper>
+
+        {/* Danger Zone */}
+        <Paper 
+          variant="outlined" 
+          sx={{ 
+            p: 3, 
+            mt: 4, 
+            border: '1px solid #ff1744',
+            bgcolor: 'error.lighter'
+          }}
+        >
+          <Typography variant="h6" gutterBottom color="error">
+            Danger Zone
+          </Typography>
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+            onClick={() => setResetDialogOpen(true)}
+            sx={{ mt: 1 }}
+          >
+            Reset Learning Progress
+          </Button>
+        </Paper>
+      </Paper>
+
+      {/* Edit Profile Dialog */}
+      <Dialog 
+        open={editDialogOpen} 
+        onClose={handleCloseEditDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Name"
+              name="name"
+              value={editForm.name}
+              onChange={handleInputChange}
+              variant="outlined"
+              autoComplete="off"
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={editForm.email}
+              onChange={handleInputChange}
+              variant="outlined"
+              autoComplete="off"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Cancel</Button>
+          <Button onClick={handleSaveProfile} variant="contained">
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Reset Confirmation Dialog */}
       <Dialog
@@ -245,7 +219,7 @@ const Profile = () => {
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <WarningIcon color="warning" />
-          Reset Learning History
+          Reset Learning Progress
         </DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
@@ -276,14 +250,8 @@ const Profile = () => {
           </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResetDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleResetLearning}
-            color="error"
-            variant="contained"
-          >
+          <Button onClick={() => setResetDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleResetLearning} color="error" variant="contained">
             Reset Everything
           </Button>
         </DialogActions>

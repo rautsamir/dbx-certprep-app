@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 const UserContext = createContext();
 
 const DEFAULT_USER_PROFILE = {
-  name: 'User',
-  email: 'user@example.com',
+  name: 'Guest',
+  email: '',
   company: '',
   objective: '',
   certificationStatus: 'Not Started',

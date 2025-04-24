@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -21,160 +21,172 @@ import ModuleQuiz from './pages/ModuleQuiz';
 import PracticeExercise from './pages/PracticeExercise';
 import Flashcards from './pages/Flashcards';
 
-// Create theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#0078FF', // Databricks blue
-      light: '#3399FF',
-      dark: '#0055B3',
-      contrastText: '#FFFFFF',
-    },
-    secondary: {
-      main: '#FF3621', // Databricks red
-      light: '#FF6B5B',
-      dark: '#CC2A1A',
-      contrastText: '#FFFFFF',
-    },
-    background: {
-      default: '#F7F9FC',
-      paper: '#FFFFFF',
-    },
-    text: {
-      primary: '#1A1A1A',
-      secondary: '#666666',
-    },
-    success: {
-      main: '#00B96B',
-      light: '#33C78A',
-      dark: '#009455',
-    },
-    warning: {
-      main: '#FFB020',
-      light: '#FFC04D',
-      dark: '#CC8C19',
-    },
-    error: {
-      main: '#FF3621',
-      light: '#FF6B5B',
-      dark: '#CC2A1A',
-    },
-    info: {
-      main: '#0078FF',
-      light: '#3399FF',
-      dark: '#0055B3',
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 600,
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2rem',
-    },
-    h3: {
-      fontWeight: 600,
-      fontSize: '1.75rem',
-    },
-    h4: {
-      fontWeight: 600,
-      fontSize: '1.5rem',
-    },
-    h5: {
-      fontWeight: 600,
-      fontSize: '1.25rem',
-    },
-    h6: {
-      fontWeight: 600,
-      fontSize: '1rem',
-    },
-    subtitle1: {
-      fontWeight: 500,
-      fontSize: '1rem',
-    },
-    subtitle2: {
-      fontWeight: 500,
-      fontSize: '0.875rem',
-    },
-    body1: {
-      fontSize: '1rem',
-      lineHeight: 1.5,
-    },
-    body2: {
-      fontSize: '0.875rem',
-      lineHeight: 1.5,
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 500,
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: '8px 16px',
-          fontWeight: 500,
-        },
-        contained: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-    MuiAccordion: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          '&:before': {
-            display: 'none',
-          },
-        },
-      },
-    },
-    MuiLinearProgress: {
-      styleOverrides: {
-        root: {
-          borderRadius: 4,
-          height: 8,
-        },
-      },
-    },
-  },
-});
-
 function App() {
+  const [mode, setMode] = React.useState(() => {
+    return localStorage.getItem('darkMode') === 'true' ? 'dark' : 'light';
+  });
+
+  const theme = useMemo(() => createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: '#0078FF', // Databricks blue
+        light: '#3399FF',
+        dark: '#0055B3',
+        contrastText: '#FFFFFF',
+      },
+      secondary: {
+        main: '#FF3621', // Databricks red
+        light: '#FF6B5B',
+        dark: '#CC2A1A',
+        contrastText: '#FFFFFF',
+      },
+      background: {
+        default: mode === 'dark' ? '#121212' : '#F7F9FC',
+        paper: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
+      },
+      text: {
+        primary: mode === 'dark' ? '#FFFFFF' : '#1A1A1A',
+        secondary: mode === 'dark' ? '#B0B0B0' : '#666666',
+      },
+      success: {
+        main: '#00B96B',
+        light: '#33C78A',
+        dark: '#009455',
+      },
+      warning: {
+        main: '#FFB020',
+        light: '#FFC04D',
+        dark: '#CC8C19',
+      },
+      error: {
+        main: '#FF3621',
+        light: '#FF6B5B',
+        dark: '#CC2A1A',
+      },
+      info: {
+        main: '#0078FF',
+        light: '#3399FF',
+        dark: '#0055B3',
+      },
+    },
+    typography: {
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      h1: {
+        fontWeight: 600,
+        fontSize: '2.5rem',
+      },
+      h2: {
+        fontWeight: 600,
+        fontSize: '2rem',
+      },
+      h3: {
+        fontWeight: 600,
+        fontSize: '1.75rem',
+      },
+      h4: {
+        fontWeight: 600,
+        fontSize: '1.5rem',
+      },
+      h5: {
+        fontWeight: 600,
+        fontSize: '1.25rem',
+      },
+      h6: {
+        fontWeight: 600,
+        fontSize: '1rem',
+      },
+      subtitle1: {
+        fontWeight: 500,
+        fontSize: '1rem',
+      },
+      subtitle2: {
+        fontWeight: 500,
+        fontSize: '0.875rem',
+      },
+      body1: {
+        fontSize: '1rem',
+        lineHeight: 1.5,
+      },
+      body2: {
+        fontSize: '0.875rem',
+        lineHeight: 1.5,
+      },
+      button: {
+        textTransform: 'none',
+        fontWeight: 500,
+      },
+    },
+    shape: {
+      borderRadius: 8,
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            padding: '8px 16px',
+            fontWeight: 500,
+          },
+          contained: {
+            boxShadow: 'none',
+            '&:hover': {
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+          },
+        },
+      },
+      MuiAccordion: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            '&:before': {
+              display: 'none',
+            },
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: {
+            borderRadius: 4,
+            height: 8,
+          },
+        },
+      },
+    },
+  }), [mode]);
+
+  const toggleColorMode = React.useCallback(() => {
+    setMode((prevMode) => {
+      const newMode = prevMode === 'light' ? 'dark' : 'light';
+      localStorage.setItem('darkMode', newMode === 'dark');
+      return newMode;
+    });
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <UserProvider>
         <Router>
           <Box sx={{ display: 'flex' }}>
-            <Navbar />
+            <Navbar onToggleTheme={toggleColorMode} />
             <Box
               component="main"
               sx={{
